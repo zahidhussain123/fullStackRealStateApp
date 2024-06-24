@@ -18,37 +18,37 @@ export const createResidency = asyncHandler(async (req, res) => {
             res.status(409).send({ message: "Residency already exists" });
             throw new Error("Residency already existed")
         } else {
-            res.status(500).send({message: "Error occured"})
+            res.status(500).send({ message: "Error occured" })
             throw new Error(error.message)
         }
     }
 
-}) 
+})
 
-export const getAllResidencies = asyncHandler( async (req, res) => {
+export const getAllResidencies = asyncHandler(async (req, res) => {
     try {
         const residencies = await prisma.residency.findMany({
             orderBy: {
                 createdAt: "desc"
             }
         })
-        res.status(200).send({message: "All Residencies fetched", residencies})
+        res.status(200).send({ message: "All Residencies fetched", residencies })
     } catch (error) {
-        res.status(500).send({message: "Internal Server Error"})
+        res.status(500).send({ message: "Internal Server Error" })
         throw new Error(error.message)
     }
 })
 
-export const getOneResidencies = asyncHandler( async (req, res) => {
+export const getOneResidencies = asyncHandler(async (req, res) => {
     try {
         const residency = await prisma.residency.findUnique({
             where: {
                 id: req.params.id,
             }
         })
-        res.status(200).send({message: "Unique Residency fetched", residency})
+        res.status(200).send({ message: "Unique Residency fetched", residency })
     } catch (error) {
-        res.status(500).send({message: "Internal Server Error"})
+        res.status(500).send({ message: "Internal Server Error" })
         throw new Error(error.message)
     }
 })
