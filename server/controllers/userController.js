@@ -1,20 +1,33 @@
 import asyncHandler from "express-async-handler";
 import { prisma } from "../config/prismaConfig.js"
 
-export const createUser = asyncHandler(async (req, res) => {
-    let { email } = req.body
+// export const createUser = asyncHandler(async (req, res) => {
+//     let { email } = req.body
 
-    const userExisted = await prisma.user.findUnique({ where: { email } })
-    const userCreate = await prisma.user.create({ data: req.body })
-    if (userExisted) {
-        res.status(409).send({ message: "User already existed" })
-    } else {
-        res.status(201).send({
-            message: "user created successfully",
-            user: userCreate
-        })
-    }
-})
+//     const userExisted = await prisma.user.findUnique({ where: { email } })
+//     const userCreate = await prisma.user.create({ data: req.body })
+//     if (userExisted) {
+//         res.status(409).send({ message: "User already existed" })
+//     } else {
+//         res.status(201).send({
+//             message: "user created successfully",
+//             user: userCreate
+//         })
+//     }
+// })
+export const createUser = asyncHandler(async (req, res) => {
+    console.log("creating a user");
+  
+    let { email } = req.body;
+    const userExists = await prisma.user.findUnique({ where: { email: email } });
+    if (!userExists) {
+      const user = await prisma.user.create({ data: req.body });
+      res.send({
+        message: "User registered successfully",
+        user: user,
+      });
+    } else res.status(201).send({ message: "User already registered" });
+  });
 
 export const bookVisits = asyncHandler(async (req, res) => {
     const { id } = req.params
@@ -30,7 +43,7 @@ export const bookVisits = asyncHandler(async (req, res) => {
         })
         const isBookedExisted = await alreadyBookedVisit.bookedVisits.some((visit) => visit.id === id)
         if (isBookedExisted) {
-            res.status(400).send("This is already booked by you");
+            res.status(400).send({message: "This is already booked by you"});
         } else {
             const postBookVisit = await prisma.user.update({
                 where: {
