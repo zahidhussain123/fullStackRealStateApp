@@ -43,14 +43,14 @@ export const bookVisits = asyncHandler(async (req, res) => {
         })
         const isBookedExisted = await alreadyBookedVisit.bookedVisits.some((visit) => visit.id === id)
         if (isBookedExisted) {
-            res.status(400).send({message: "This is already booked by you"});
+            res.send({message: "This is already booked by you"});
         } else {
             const postBookVisit = await prisma.user.update({
                 where: {
                     email
                 },
                 data: {
-                    bookedVisits: { push: { id, date } }
+                    bookedVisits: { push: { id, date} }
                 }
             })
             res.status(201).send({ message: "Successfully booked", })
@@ -86,7 +86,7 @@ export const cancelBookVisit = asyncHandler(async (req, res) => {
         if (getIndex === -1) {
             res.status(404).json({ message: "Booking not found" });
         } else {
-            getbookedVisit?.bookedVisits?.splice(getbookedVisit, 1)
+            getbookedVisit?.bookedVisits?.splice(getIndex, 1)
             await prisma.user.update({
                 where: { email },
                 data: {
@@ -138,3 +138,17 @@ export const favResidencies = asyncHandler(async (req, res) => {
         throw new Error(error.message)
     }
 })
+
+// function to get all favorites
+export const getAllFavorites = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    try {
+      const favResd = await prisma.user.findUnique({
+        where: { email },
+        select: { favResidenciesID: true },
+      });
+      res.status(201).send(favResd);
+    } catch (err) {
+      throw new Error(err.message);
+    }
+  });
